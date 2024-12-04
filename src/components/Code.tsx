@@ -3,6 +3,7 @@
  */
 
 import React, { useEffect, useState } from "react";
+import Logo from "../media/logo.svg";
 
 interface CodeAuthenticationProps {
   codeReceivedByUser: string;
@@ -48,6 +49,20 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
     }
   };
 
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const inputs =
+      document.querySelectorAll<HTMLInputElement>("input[type='text']");
+
+    if (e.key === "ArrowRight" && inputs[index + 1]) {
+      inputs[index + 1].focus();
+    } else if (e.key === "ArrowLeft" && inputs[index - 1]) {
+      inputs[index - 1].focus();
+    }
+  };
+
   useEffect(() => {
     setCodeCertified(codeReceivedByUser.split(""));
   }, [codeReceivedByUser]);
@@ -68,8 +83,8 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
 
   return (
     <div className="mt-28 relative">
-      <div className="text-center text-4xl font-semibold mb-10">
-        Code Authentication
+      <div className="text-4xl font-semibold mb-10 flex justify-center">
+        <img src={Logo} alt="" className="w-60 md:w-96" />
       </div>
       {isCodeExist && (
         <div className="text-center font-light text-sm">
@@ -81,7 +96,7 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
           <input
             key={index}
             type="text"
-            className={`w-28 h-40 border p-7 text-center text-5xl font-light border-r-0 last:border-r first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg shadow-sm ${
+            className={`w-14 h-28 md:w-28 md:h-40 border p-1 md:p-7 text-center text-xl md:text-5xl font-light border-r-0 last:border-r first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg shadow-sm ${
               codeToVerify.length === codeReceivedByUser.length
                 ? isAuthentic
                   ? "border-green-300"
@@ -91,11 +106,12 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
             maxLength={1}
             onChange={(e) => handleInputChange(e.target.value, index)}
             onPaste={handlePaste}
+            onKeyDown={(e) => handleKeyDown(e, index)}
           />
         ))}
       </div>
       <div className="text-xs font-semibold mt-8 fixed bottom-4 left-1/2 transform -translate-x-1/2">
-        Powered by VitAuth©
+        Powered by Dubrulle Gaëtan
       </div>
     </div>
   );

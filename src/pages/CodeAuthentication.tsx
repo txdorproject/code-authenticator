@@ -21,13 +21,13 @@ function CodeAuthentication() {
         codeReceivedByUser={codeGenerated}
       />
       <button
-        className="absolute top-3 left-3 bg-cyan-700 px-4 py-2 rounded text-white"
+        className="absolute top-3 left-3 bg-orange-500 px-4 py-2 rounded text-white"
         onClick={() => generateCode(6)}
       >
-        Generate code
+        Generate a code
       </button>
       {codeGenerated && (
-        <div className="fixed bottom-4 left-4 bg-slate-600 text-white rounded p-4">
+        <div className="fixed bottom-12 md:bottom-4 left-4 bg-slate-600 text-white rounded px-7 py-4">
           {codeGenerated}
         </div>
       )}
