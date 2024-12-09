@@ -1,7 +1,3 @@
-/**
- * [] create nbOfAttempt functionnality
- */
-
 import React, { useEffect, useState } from "react";
 import Logo from "../media/logo.svg";
 
@@ -13,7 +9,6 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
   const [codeCertified, setCodeCertified] = useState<string[]>([]);
   const [codeToVerify, setCodeToVerify] = useState<string[]>([]);
   const [isAuthentic, setIsAuthentic] = useState<boolean>(false);
-  const [isCodeExist, setIsCodeExist] = useState<boolean>(false);
   const [nbOfAttempt, setNbOfAttempt] = useState<number>(0);
 
   const handleInputChange = (char: string, index: number) => {
@@ -65,28 +60,34 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
 
   useEffect(() => {
     setCodeCertified(codeReceivedByUser.split(""));
+    setNbOfAttempt(0);
+    setCodeToVerify([]);
   }, [codeReceivedByUser]);
 
   useEffect(() => {
-    if (codeCertified.length > 0) {
-      setIsCodeExist(true);
+    if (codeToVerify.length !== codeCertified.length) return;
+    const allCharsFilled = codeToVerify.every((char) => char !== "");
+    const isMatching = codeToVerify.every(
+      (char, index) => char === codeCertified[index]
+    );
+    if (allCharsFilled && !isMatching) {
+      setNbOfAttempt((prev) => prev + 1);
     }
-  }, [codeCertified]);
+    setIsAuthentic(allCharsFilled && isMatching);
+  }, [codeToVerify, codeCertified]);
 
   useEffect(() => {
-    const isAuthentic =
-      codeToVerify.length === codeCertified.length &&
-      codeToVerify.every((char, index) => char === codeCertified[index]);
-
-    setIsAuthentic(isAuthentic);
-  }, [codeToVerify, codeCertified]);
+    if (nbOfAttempt === 3) {
+      setCodeCertified([]);
+    }
+  }, [nbOfAttempt]);
 
   return (
     <div className="mt-28 relative">
       <div className="text-4xl font-semibold mb-10 flex justify-center">
         <img src={Logo} alt="" className="w-60 md:w-96" />
       </div>
-      {isCodeExist && (
+      {codeCertified.length > 0 && (
         <div className="text-center font-light text-sm">
           Please enter the code you received
         </div>
@@ -97,7 +98,8 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
             key={index}
             type="text"
             className={`w-14 h-28 md:w-28 md:h-40 border p-1 md:p-7 text-center text-xl md:text-5xl font-light border-r-0 last:border-r first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg shadow-sm ${
-              codeToVerify.length === codeReceivedByUser.length
+              codeToVerify.length === codeReceivedByUser.length &&
+              codeToVerify.every((char) => char !== undefined && char !== "")
                 ? isAuthentic
                   ? "border-green-300"
                   : "border-red-300"
@@ -109,6 +111,14 @@ function CodeAuthentication({ codeReceivedByUser }: CodeAuthenticationProps) {
             onKeyDown={(e) => handleKeyDown(e, index)}
           />
         ))}
+      </div>
+      <div>
+        {nbOfAttempt === 3 && (
+          <div className="text-center text-red-500 font-medium mt-4 text-xs">
+            You have reached the maximum number of attempts. You have to
+            generated a new code.
+          </div>
+        )}
       </div>
       <div className="text-xs font-semibold mt-8 fixed bottom-4 left-1/2 transform -translate-x-1/2">
         Powered by Dubrulle Gaëtan
